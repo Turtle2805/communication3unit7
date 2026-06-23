@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ms Lê Hằng English - Luyện Tập Lớp Học Sáng Tạo</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --primary: #8854C0;
+            --secondary: #FDCB6E;
+            --accent: #00C9A7;
+            --correct: #00D26A;
+            --wrong: #FF4757;
+            --text-dark: #2D3436;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Quicksand', 'Nunito', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #FF9FF3, #FDCB6E, #00C9A7, #8854C0, #74B9FF);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+            position: relative;
+            padding: 15px 8px 100px 8px;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating decoration layer */
+        .decorations-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .floating-item {
+            position: absolute;
+            opacity: 0.25;
+            animation: floatSlow 20s linear infinite;
+        }
+
+        @keyframes floatSlow {
+            0% { transform: translateY(110vh) rotate(0deg) scale(0.8); }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(1.2); }
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 3D shadow style buttons */
+        .gamified-btn {
+            border-bottom: 5px solid #CBD5E1;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .gamified-btn:hover:not(.disabled) {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .gamified-btn:active:not(.disabled) {
+            transform: translateY(2px) scale(0.98);
+            border-bottom-width: 2px;
+        }
+
+        /* Correct/Wrong Visual Highlights */
+        .option-btn.correct {
+            background-color: #D4EDDA !important;
+            border-color: var(--correct) !important;
+            border-bottom: 5px solid #219653 !important;
+            color: #155724 !important;
+        }
+
+        .option-btn.wrong {
+            background-color: #FCE8E6 !important;
+            border-color: var(--wrong) !important;
+            border-bottom: 5px solid #EB5757 !important;
+            color: #A83232 !important;
+        }
+
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.95;
+        }
+
+        /* Shake animation for errors */
+        .shake {
+            animation: shakeWidget 0.45s ease;
+        }
+
+        @keyframes shakeWidget {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        /* Active state for navigation tabs */
+        .tab-btn.active {
+            background: var(--primary);
+            color: white !important;
+            border-color: #713BB0;
+            border-bottom: 5px solid #5F27CD;
+            box-shadow: 0 6px 15px rgba(136, 84, 192, 0.45);
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="decorations-container">
+        <!-- Kitten SVG -->
+        <svg class="floating-item" style="left: 5%; animation-duration: 25s; animation-delay: 0s;" width="45" height="45" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M12 2c-1.1 0-2 .9-2 2v.1c-.6.3-1.1.7-1.5 1.2L7.3 4.1C6.9 3.7 6.3 3.7 6 4s-.3.9 0 1.2l1.6 1.6C7.2 7.4 7 8.2 7 9c0 2.2 1.4 4.1 3.4 4.7l-.4.3c-.6.4-1 1-1 1.7 0 1.1.9 2 2 2s2-.9 2-2c0-.7-.4-1.3-1-1.7l-.4-.3C15.6 13.1 17 11.2 17 9c0-.8-.2-1.6-.6-2.2l1.6-1.6c.3-.3.3-.9 0-1.2s-.9-.3-1.2 0l-1.2 1.2c-.4-.5-.9-.9-1.5-1.2V4c0-1.1-.9-2-2-2zm-3 7c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm6 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/>
+        </svg>
+        <!-- Star SVG -->
+        <svg class="floating-item" style="left: 25%; animation-duration: 18s; animation-delay: 2s;" width="35" height="35" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+        </svg>
+        <!-- Cloud SVG -->
+        <svg class="floating-item" style="left: 55%; animation-duration: 22s; animation-delay: 5s;" width="55" height="35" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+        </svg>
+        <!-- Strawberry SVG -->
+        <svg class="floating-item" style="left: 85%; animation-duration: 28s; animation-delay: 1s;" width="30" height="40" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M12 2c-.55 0-1 .45-1 1v1.12C8.36 4.54 6.13 6.4 5.33 9.06c-.63 2.11-.27 4.31.98 6.03l5.02 5.02c.39.39 1.02.39 1.41 0l5.02-5.02c1.24-1.72 1.6-3.92.98-6.03-.8-2.66-3.03-4.52-5.67-4.94V3c0-.55-.45-1-1-1zm-3 7c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm6 4c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/>
+        </svg>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container">
+        <!-- Brand Header with small profile banner -->
+        <header class="text-center mb-4 text-white drop-shadow-md">
+            <div class="inline-flex items-center gap-2 bg-black/35 px-4 py-1.5 rounded-full text-[11px] font-black border border-white/20 mb-2">
+                <i class="fa-solid fa-graduation-cap text-[#FDCB6E]"></i> Giáo viên tạo: Ms Lê Hằng English
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-wide flex items-center justify-center gap-2">
+                🌟 Ôn Tập Tiếng Anh Siêu Cấp 🌟
+            </h1>
+        </header>
+
+        <!-- Dynamic Warning Banner -->
+        <div class="bg-[#FFEAA7] border-4 border-[#FDCB6E] rounded-2xl p-4 mb-4 shadow-lg transform -rotate-[0.5deg]">
+            <h3 class="text-[#D63031] text-md font-black flex items-center justify-center gap-2 mb-1.5 text-center">
+                ⚠️ LỜI NHẮC CỰC KỲ QUAN TRỌNG ⚠️
+            </h3>
+            <p class="text-xs sm:text-sm text-[#2D3436] font-bold text-center leading-relaxed">
+                Chỉ có đọc kỹ giải thích ngay sau mỗi câu, sau đó ghi lại từ vựng/cấu trúc mới vào vở để học thì mới thực sự giỏi lên.<br>
+                Làm cho xong mà không đọc giải thích hay đọc qua loa không ghi chép thì chỉ tốn thời gian vô ích!<br>
+                <span class="text-[#8854C0] font-black">* Kéo tới đâu, làm tới đó! *</span>
+            </p>
+        </div>
+
+        <!-- Exercise Navigation Tabs Grid -->
+        <div class="grid grid-cols-2 gap-2 mb-4" id="tabs-container"></div>
+
+        <!-- Quiz Container Box -->
+        <div id="active-quiz-container"></div>
+    </div>
+
+    <!-- Floating Sticky Bottom Scoreboard and Submission Bar -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white shadow-[0_-8px_30px_rgba(0,0,0,0.15)] py-3.5 px-6 flex justify-between items-center z-50 border-t-4 border-[#8854C0]">
+        <div class="flex items-center gap-2 text-md sm:text-lg font-black text-[#8854C0]" id="footer-score-display">
+            ⭐ Điểm của con: 0
+        </div>
+        <button class="bg-[#00D26A] text-white border-b-4 border-[#219653] hover:translate-y-[-2px] active:translate-y-[2px] active:border-b-2 hover:shadow-[0_6px_18px_rgba(0,210,106,0.4)] px-5 sm:px-8 py-2.5 rounded-full text-sm sm:text-md font-black transition-all flex items-center gap-2" onclick="gradeExam()">
+            NỘP BÀI <i class="fa-solid fa-paper-plane animate-bounce text-xs"></i>
+        </button>
+    </div>
+
+    <!-- Score Overlay popup dialogues -->
+    <div id="gradeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden justify-center items-center z-[10000] p-4">
+        <div class="bg-white rounded-[30px] p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl border-6 border-[#8854C0] transform scale-90 transition-transform duration-300" id="modal-card">
+            <div class="text-xl font-black text-[#8854C0] mb-2">🌟 KẾT QUẢ BÀI LÀM CỦA CON 🌟</div>
+            <div class="text-4xl font-black text-[#00D26A] my-3 drop-shadow-md" id="scoreDisplay">0 / 0</div>
+            <div class="text-xs sm:text-sm leading-relaxed text-[#4A5568] font-bold mb-5 bg-slate-50 p-4 rounded-xl border border-slate-100" id="feedbackDisplay">Loading...</div>
+            <button class="bg-[#8854C0] text-white border-b-4 border-[#5F27CD] px-6 py-3 font-black text-sm rounded-xl hover:scale-105 active:scale-95 transition-all w-full" onclick="closeGradeModal()">
+                LÀM LẠI & HỌC TIẾP 📚
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Synthesizer (No external links)
+        const playSfx = (type) => {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (type === 'correct') {
+                    // Chime sound effect
+                    const osc1 = ctx.createOscillator();
+                    const osc2 = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+
+                    osc1.type = 'triangle';
+                    osc1.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc1.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.15); // C6
+
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(659.25, ctx.currentTime + 0.05); // E5
+                    osc2.frequency.exponentialRampToValueAtTime(1318.51, ctx.currentTime + 0.20); // E6
+
+                    gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+
+                    osc1.connect(gainNode);
+                    osc2.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+
+                    osc1.start();
+                    osc2.start();
+                    osc1.stop(ctx.currentTime + 0.35);
+                    osc2.stop(ctx.currentTime + 0.35);
+                } else if (type === 'wrong') {
+                    // "Téo teo tèo" sound effect
+                    const frequencies = [220, 185, 147];
+                    const duration = 0.18;
+
+                    frequencies.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(freq, ctx.currentTime + (idx * duration));
+                        
+                        gain.gain.setValueAtTime(0, ctx.currentTime + (idx * duration));
+                        gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + (idx * duration) + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + (idx * duration) + duration - 0.02);
+
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        
+                        osc.start(ctx.currentTime + (idx * duration));
+                        osc.stop(ctx.currentTime + (idx * duration) + duration);
+                    });
+                }
+            } catch(e) {
+                console.warn("Audio Context blocked or unsupported: ", e);
+            }
+        };
+
+        // Confetti Engine
+        const activeConfetti = [];
+        const canvas = document.getElementById("confetti-canvas");
+        const ctxCanvas = canvas.getContext("2d");
+
+        function resizeConfettiCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeConfettiCanvas);
+        resizeConfettiCanvas();
+
+        function createConfettiExplosion() {
+            for (let i = 0; i < 50; i++) {
+                activeConfetti.push({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height + 20,
+                    size: Math.random() * 8 + 5,
+                    color: `hsl(${Math.random() * 360}, 95%, 65%)`,
+                    speedX: Math.random() * 10 - 5,
+                    speedY: -(Math.random() * 14 + 10),
+                    gravity: 0.3,
+                    rotation: Math.random() * 360,
+                    rotSpeed: Math.random() * 12 - 6
+                });
+            }
+        }
+
+        function updateConfetti() {
+            ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = activeConfetti.length - 1; i >= 0; i--) {
+                const p = activeConfetti[i];
+                p.x += p.speedX;
+                p.y += p.speedY;
+                p.speedY += p.gravity;
+                p.rotation += p.rotSpeed;
+
+                ctxCanvas.save();
+                ctxCanvas.translate(p.x, p.y);
+                ctxCanvas.rotate(p.rotation * Math.PI / 180);
+                ctxCanvas.fillStyle = p.color;
+                ctxCanvas.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                ctxCanvas.restore();
+
+                if (p.y > canvas.height + 50) {
+                    activeConfetti.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+        requestAnimationFrame(updateConfetti);
+    </script>
+
+    <script>
+        const exercisesMeta = [
+            { id: "ex11", label: "Phần 1: Ex 11", title: "Exercise 11: Choose the word or phrase (A, B, C, or D) that best completes each of the following exchanges." },
+            { id: "ex12", label: "Phần 2: Ex 12", title: "Exercise 12: Choose the correct answer (A, B, C, or D) to arrange the following sentences into a meaningful conversation." }
+        ];
+
+        const database = {
+            ex11: [
+                {
+                    id: "ex11_1",
+                    q: "“My classmates opened an English class for the children in the orphanage.” - “______”",
+                    options: [
+                        "It’s wonderful!",
+                        "How fluent their English is!",
+                        "What excellent students!",
+                        "Sounds like easy jobs!"
+                    ],
+                    ans: "It’s wonderful!",
+                    exp: `
+                        <p class="font-bold text-sky-800">Bước 1: Dịch nghĩa toàn câu</p>
+                        <p class="pl-3 border-l-2 border-sky-300">"Bạn cùng lớp của tớ đã mở một lớp học tiếng Anh cho trẻ em ở trại trẻ mồ côi." - "Thật tuyệt vời!"</p>
+                        <p class="font-bold text-sky-800 mt-2">Bước 2: Phân tích nghĩa 4 đáp án</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li><strong>A. It’s wonderful!:</strong> Thật tuyệt vời!</li>
+                            <li><strong>B. How fluent their English is!:</strong> Tiếng Anh của chúng trôi chảy làm sao!</li>
+                            <li><strong>C. What excellent students!:</strong> Những học sinh xuất sắc làm sao!</li>
+                            <li><strong>D. Sounds like easy jobs!:</strong> Nghe có vẻ là những công việc dễ dàng!</li>
+                        </ul>
+                        <p class="font-bold text-[#8854C0] mt-2">Bước 3: Tại sao chọn A?</p>
+                        <p class="pl-3 border-l-2 border-emerald-300">"It's wonderful!" là câu phản hồi phù hợp và lịch sự nhất để bày tỏ sự tán thành, khen ngợi và vui mừng trước một hành động nhân văn, có ý nghĩa xã hội to lớn như mở lớp học tình thương cho trẻ mồ côi.</p>
+                        <p class="font-bold text-rose-700 mt-2">Bước 4: Tại sao các phương án khác SAI?</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li>Phương án B sai vì người nghe chưa thể biết tiếng Anh của các bạn hay các em nhỏ có trôi chảy hay không ngay lúc này.</li>
+                            <li>Phương án C không phù hợp vì câu chuyện đang nói về việc mở lớp tình nguyện chứ không phải để đánh giá học sinh giỏi/dở.</li>
+                            <li>Phương án D sai vì việc giảng dạy tình nguyện không hề dễ dàng, và nói như vậy có phần thiếu tôn trọng nỗ lực của các bạn.</li>
+                        </ul>
+                    `
+                },
+                {
+                    id: "ex11_2",
+                    q: "“We pick up litter and clean up the streets in our neighbourhood every Sunday.” - “______”",
+                    options: [
+                        "Your results are amazing!",
+                        "I don’t like it.",
+                        "Sounds like great work!",
+                        "They are so funny!"
+                    ],
+                    ans: "Sounds like great work!",
+                    exp: `
+                        <p class="font-bold text-sky-800">Bước 1: Dịch nghĩa toàn câu</p>
+                        <p class="pl-3 border-l-2 border-sky-300">"Chúng tớ nhặt rác và dọn dẹp đường phố ở khu phố của mình vào mỗi Chủ Nhật." - "Nghe có vẻ là một công việc tuyệt vời đấy!"</p>
+                        <p class="font-bold text-sky-800 mt-2">Bước 2: Phân tích nghĩa 4 đáp án</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li><strong>A. Your results are amazing!:</strong> Kết quả của các bạn thật đáng kinh ngạc!</li>
+                            <li><strong>B. I don’t like it.:</strong> Tớ không thích điều đó.</li>
+                            <li><strong>C. Sounds like great work!:</strong> Nghe có vẻ là một công việc tuyệt vời!</li>
+                            <li><strong>D. They are so funny!:</strong> Họ thật là vui nhộn!</li>
+                        </ul>
+                        <p class="font-bold text-[#8854C0] mt-2">Bước 3: Tại sao chọn C?</p>
+                        <p class="pl-3 border-l-2 border-emerald-300">Cụm từ "Sounds like great work!" là một phản hồi lý tưởng nhằm cổ vũ, ca ngợi hành động bảo vệ môi trường công ích của người nói.</p>
+                        <p class="font-bold text-rose-700 mt-2">Bước 4: Tại sao các phương án khác SAI?</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li>Phương án A nghe quá cường điệu, khiêu khích và không tự nhiên đối với một cuộc trò chuyện hàng ngày thông thường.</li>
+                            <li>Phương án B quá thô lỗ và bất lịch sự trong giao tiếp xã hội xã giao.</li>
+                            <li>Phương án D sai vì hoạt động dọn dẹp bảo vệ môi trường không mang tính chất đùa cợt hay "funny" (vui nhộn/buồn cười).</li>
+                        </ul>
+                    `
+                },
+                {
+                    id: "ex11_3",
+                    q: "“Which activity do you want to join?” - “______”",
+                    options: [
+                        "I often clean the street and plant trees.",
+                        "I want to participate in serving food for homeless people.",
+                        "It is good to do community service.",
+                        "I don’t have much time."
+                    ],
+                    ans: "I want to participate in serving food for homeless people.",
+                    exp: `
+                        <p class="font-bold text-sky-800">Bước 1: Dịch nghĩa toàn câu</p>
+                        <p class="pl-3 border-l-2 border-sky-300">"Cậu muốn tham gia hoạt động nào?" - "Tớ muốn tham gia phát đồ ăn cho những người vô gia cư."</p>
+                        <p class="font-bold text-sky-800 mt-2">Bước 2: Phân tích nghĩa 4 đáp án</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li><strong>A. I often clean the street and plant trees.:</strong> Tớ thường dọn dẹp đường phố và trồng cây.</li>
+                            <li><strong>B. I want to participate in serving food for homeless people.:</strong> Tớ muốn tham gia phục vụ đồ ăn cho người vô gia cư.</li>
+                            <li><strong>C. It is good to do community service.:</strong> Thật tốt khi tham gia dịch vụ cộng đồng.</li>
+                            <li><strong>D. I don’t have much time.:</strong> Tớ không có nhiều thời gian đâu.</li>
+                        </ul>
+                        <p class="font-bold text-[#8854C0] mt-2">Bước 3: Tại sao chọn B?</p>
+                        <p class="pl-3 border-l-2 border-emerald-300">Câu hỏi sử dụng "want to join" (muốn tham gia) hỏi về mong muốn ở tương lai. Do đó câu trả lời chuẩn xác nhất phải trực tiếp trả lời mong muốn của bản thân bằng cấu trúc tương ứng: <strong>I want to participate in...</strong> (Tớ muốn tham gia vào...).</p>
+                        <p class="font-bold text-rose-700 mt-2">Bước 4: Tại sao các phương án khác SAI?</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li>Phương án A nói về thói quen thường xuyên trong quá khứ/hiện tại bằng "often", không trả lời trực tiếp cho câu hỏi lựa chọn mong muốn sắp tới.</li>
+                            <li>Phương án C chỉ là một lời nhận xét khách quan, không đưa ra được lựa chọn hoạt động của cá nhân.</li>
+                            <li>Phương án D là câu từ chối né tránh, không chỉ ra được hoạt động cụ thể nào muốn tham gia.</li>
+                        </ul>
+                    `
+                },
+                {
+                    id: "ex11_4",
+                    q: "“Why do you want to join this volunteer work?” - “______”",
+                    options: [
+                        "I don’t want to help other people.",
+                        "I want to waste my time.",
+                        "I want to help the elderly.",
+                        "I want to improve my marks."
+                    ],
+                    ans: "I want to help the elderly.",
+                    exp: `
+                        <p class="font-bold text-sky-800">Bước 1: Dịch nghĩa toàn câu</p>
+                        <p class="pl-3 border-l-2 border-sky-300">"Tại sao cậu lại muốn tham gia công việc tình nguyện này?" - "Tớ muốn giúp đỡ những người lớn tuổi."</p>
+                        <p class="font-bold text-sky-800 mt-2">Bước 2: Phân tích nghĩa 4 đáp án</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li><strong>A. I don’t want to help other people.:</strong> Tớ không muốn giúp đỡ người khác.</li>
+                            <li><strong>B. I want to waste my time.:</strong> Tớ muốn lãng phí thời gian của mình.</li>
+                            <li><strong>C. I want to help the elderly.:</strong> Tớ muốn giúp đỡ những người già yếu.</li>
+                            <li><strong>D. I want to improve my marks.:</strong> Tớ muốn cải thiện điểm số của mình ở trường.</li>
+                        </ul>
+                        <p class="font-bold text-[#8854C0] mt-2">Bước 3: Tại sao chọn C?</p>
+                        <p class="pl-3 border-l-2 border-emerald-300">Lý do "I want to help the elderly" (muốn giúp đỡ người già neo đơn) là mục tiêu cốt lõi vô cùng cao đẹp, hoàn toàn phù hợp với bản chất tự nguyện nhân ái của công việc thiện nguyện.</p>
+                        <p class="font-bold text-rose-700 mt-2">Bước 4: Tại sao các phương án khác SAI?</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li>Phương án A và B mang ý nghĩa cực kỳ tiêu cực, trái ngược hoàn toàn với ý định tham gia tình nguyện.</li>
+                            <li>Phương án D mang tính chất thực dụng cá nhân, không phản ánh đúng tinh thần cống hiến vì cộng đồng của hoạt động tình nguyện.</li>
+                        </ul>
+                    `
+                },
+                {
+                    id: "ex11_5",
+                    q: "“I’m doing some voluntary work at the local hospital.” - “______”",
+                    options: [
+                        "You are so busy!",
+                        "You are so kind!",
+                        "You are so smart!",
+                        "You are so bad!"
+                    ],
+                    ans: "You are so kind!",
+                    exp: `
+                        <p class="font-bold text-sky-800">Bước 1: Dịch nghĩa toàn câu</p>
+                        <p class="pl-3 border-l-2 border-sky-300">"Tớ đang làm một vài công việc tình nguyện tại bệnh viện địa phương đấy." - "Cậu thật tốt bụng biết bao!"</p>
+                        <p class="font-bold text-sky-800 mt-2">Bước 2: Phân tích nghĩa 4 đáp án</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li><strong>A. You are so busy!:</strong> Cậu thật là bận rộn!</li>
+                            <li><strong>B. You are so kind!:</strong> Cậu thật là tốt bụng!</li>
+                            <li><strong>C. You are so smart!:</strong> Cậu thật là thông minh!</li>
+                            <li><strong>D. You are so bad!:</strong> Cậu thật là tồi tệ!</li>
+                        </ul>
+                        <p class="font-bold text-[#8854C0] mt-2">Bước 3: Tại sao chọn B?</p>
+                        <p class="pl-3 border-l-2 border-emerald-300">Khi một người chia sẻ việc đi hỗ trợ, giúp đỡ bệnh nhân ở bệnh viện, lời tán dương tinh tế và hợp tình hợp lý nhất là dành lời khen cho lòng tốt của họ: <strong>"You are so kind!"</strong>.</p>
+                        <p class="font-bold text-rose-700 mt-2">Bước 4: Tại sao các phương án khác SAI?</p>
+                        <ul class="list-disc list-inside pl-3 space-y-1">
+                            <li>Phương án A tập trung vào trạng thái bận rộn không cần thiết và không làm nổi bật được giá trị nhân văn của hành động.</li>
+                            <li>Phương án C khen thông minh (smart) không liên quan đến hành vi cống hiến từ thiện.</li>
+                            <li>Phương án D mang tính xúc phạm nặng nề (bad - tồi tệ).</li>
+                        </ul>
+                    `
+                }
+            ],
+            ex12: [
+                {
+                    id: "ex12_1",
+                    q: `
+                        <div class="bg-violet-50 rounded-xl p-4 border-2 border-[#8854C0]/20 text-slate-700">
+                            <p class="font-black text-[#8854C0] mb-2 text-sm"><i class="fa-solid fa-comments"></i> Các câu thoại của Ally và Brian:</p>
+                            <ul class="space-y-1 text-xs font-bold pl-2">
+                                <li><strong>a. Brian:</strong> That's a wonderful idea! They always need help.</li>
+                                <li><strong>b. Ally:</strong> I hope I can make a difference for the children there.</li>
+                                <li><strong>c. Ally:</strong> I'm thinking of volunteering at the local orphanage.</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ["a-b-c", "a-c-b", "b-c-a", "c-a-b"],
+                    ans: "c-a-b",
+                    exp: `
+                        <p class="font-bold text-sky-800">Bước 1: Dịch nghĩa các câu thoại</p>
+                        <ul class="list-disc list-inside pl-3 text-xs space-y-1 text-slate-700">
+                            <li><strong>a.</strong> "Đó là một ý tưởng tuyệt vời! Họ lúc nào cũng cần sự giúp đỡ cả."</li>
+                            <li><strong>b.</strong> "Tớ hy vọng mình có thể mang lại những điều tốt đẹp khác biệt cho các em nhỏ ở đó."</li>
+                            <li><strong>c.</strong> "Tớ đang suy nghĩ về việc đi làm tình nguyện tại trại trẻ mồ côi địa phương."</li>
+                        </ul>
+                        <p class="font-bold text-[#8854C0] mt-2">Bước 2: Phân tích logic sắp xếp hội thoại</p>
+                        <p class="pl-3 border-l-2 border-emerald-300 leading-relaxed">
+                            - Bước đầu tiên, Ally phải bắt đầu cuộc trò chuyện bằng cách đưa ra ý định/kế hoạch của bản thân: <strong>(c)</strong>.<br>
+                            - Kế đến, Brian lắng nghe và đưa ra phản hồi khích lệ, tán thưởng ý kiến của bạn: <strong>(a)</strong>.<br>
+                            - Cuối cùng, Ally tiếp thu lời động viên và bày tỏ kỳ vọng tốt đẹp của mình về dự án để kết thúc cuộc thoại một cách tự nhiên: <strong>(b)</strong>.<br>
+                            Do đó, trật tự logic hoàn hảo nhất phải là <strong>c - a - b</strong>.
+                        </p>
+                    `
+                },
+                {
+                    id: "ex12_2",
+                    q: `
+                        <div class="bg-violet-50 rounded-xl p-4 border-2 border-[#8854C0]/20 text-slate-700">
+                            <p class="font-black text-[#8854C0] mb-2 text-sm"><i class="fa-solid fa-comments"></i> Các câu thoại của Ally và Brian:</p>
+                            <ul class="space-y-1 text-xs font-bold pl-2">
+                                <li><strong>a. Brian:</strong> Yes, it does! The volunteers did a great job last weekend.</li>
+                                <li><strong>b. Ally:</strong> I'm thinking of joining them next time.</li>
+                                <li><strong>c. Ally:</strong> Our community park looks so clean now, doesn't it?</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ["a-b-c", "c-a-b", "b-c-a", "a-c-b"],
+                    ans: "c-a-b",
+                    exp: `
+                        <p class="font-bold text-sky-800">Bước 1: Dịch nghĩa các câu thoại</p>
+                        <ul class="list-disc list-inside pl-3 text-xs space-y-1 text-slate-700">
+                            <li><strong>a.</strong> "Đúng vậy đó! Các tình nguyện viên đã hoàn thành công việc cực kỳ xuất sắc vào cuối tuần trước."</li>
+                            <li><strong>b.</strong> "Tớ đang suy nghĩ đến việc sẽ tham gia cùng họ vào lần tới."</li>
+                            <li><strong>c.</strong> "Công viên cộng đồng của tụi mình trông sạch sẽ quá rồi phải không?"</li>
+                        </ul>
+                        <p class="font-bold text-[#8854C0] mt-2">Bước 2: Phân tích logic sắp xếp hội thoại</p>
+                        <p class="pl-3 border-l-2 border-emerald-300 leading-relaxed">
+                            - Cuộc trò chuyện bắt đầu bằng một câu hỏi đuôi (tag question) gợi mở chủ đề trực quan về cảnh quan xung quanh của Ally: <strong>(c)</strong>.<br>
+                            - Brian đồng thuận nhiệt tình và chỉ ra nguyên nhân tại sao công viên lại sạch đẹp như vậy (nhờ các tình nguyện viên): <strong>(a)</strong>.<br>
+                            - Ally tiếp lời thể hiện mong muốn được đóng góp sức mình cùng mọi người vào lần sau: <strong>(b)</strong>.<br>
+                            Sự kết hợp hợp lý nhất tạo nên đoạn đối thoại mạch lạc là <strong>c - a - b</strong>.
+                        </p>
+                    `
+                },
+                {
+                    id: "ex12_3",
+                    q: `
+                        <div class="bg-violet-50 rounded-xl p-4 border-2 border-[#8854C0]/20 text-slate-700">
+                            <p class="font-black text-[#8854C0] mb-2 text-sm"><i class="fa-solid fa-comments"></i> Các câu thoại của Ally và Brian:</p>
+                            <ul class="space-y-1 text-xs font-bold pl-2">
+                                <li><strong>a. Brian:</strong> Yes, it's a difficult situation for them. Many don't have homes or schools.</li>
+                                <li><strong>b. Ally:</strong> That's a good idea. I'll look for some clothes to give.</li>
+                                <li><strong>c. Ally:</strong> I saw some homeless children near the market today. It made me sad.</li>
+                                <li><strong>d. Brian:</strong> We could donate old clothes or books to local charities. They help children in need.</li>
+                                <li><strong>e. Ally:</strong> Is there anything we can do to help them?</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ["c-a-e-d-b", "a-c-e-d-b", "c-e-a-d-b", "e-c-a-d-b"],
+                    ans: "c-a-e-d-b",
+                    exp: `
+                        <p class="font-bold text-sky-800">Bước 1: Dịch nghĩa các câu thoại</p>
+                        <ul class="list-disc list-inside pl-3 text-xs space-y-1 text-slate-700">
+                            <li><strong>a.</strong> "Ừm, đó thực sự là một hoàn cảnh vô cùng khó khăn đối với các em. Nhiều em còn không có mái nhà che thân hay được đi học."</li>
+                            <li><strong>b.</strong> "Ý kiến đó tuyệt thật đó. Tớ sẽ tìm lại một số quần áo cũ để quyên tặng."</li>
+                            <li><strong>c.</strong> "Hôm nay tớ thấy một vài đứa trẻ vô gia cư ở gần khu chợ. Việc đó làm tớ thấy buồn ghê."</li>
+                            <li><strong>d.</strong> "Tụi mình có thể đem tặng quần áo cũ hoặc sách vở cho các tổ chức từ thiện địa phương. Họ chuyên hỗ trợ những trẻ em cơ nhỡ."</li>
+                            <li><strong>e.</strong> "Có việc gì mà tụi mình có thể làm được để giúp đỡ các em không nhỉ?"</li>
+                        </ul>
+                        <p class="font-bold text-[#8854C0] mt-2">Bước 2: Phân tích logic sắp xếp hội thoại</p>
+                        <p class="pl-3 border-l-2 border-emerald-300 leading-relaxed">
+                            - Ally khơi mào bằng chia sẻ cảm xúc buồn sau khi chứng kiến hoàn cảnh khó khăn thực tế: <strong>(c)</strong>.<br>
+                            - Brian lập tức đồng cảm và làm rõ thêm vấn đề khó khăn của các em nhỏ: <strong>(a)</strong>.<br>
+                            - Ally tiếp tục đặt câu hỏi tìm kiếm giải pháp giúp đỡ thiết thực: <strong>(e)</strong>.<br>
+                            - Brian đưa ra gợi ý quyên góp cụ thể thông qua tổ chức từ thiện: <strong>(d)</strong>.<br>
+                            - Ally hào hứng đồng ý và lên kế hoạch gom đồ quyên tặng ngay lập tức: <strong>(b)</strong>.<br>
+                            Trình tự hội thoại đúng và tự nhiên nhất là <strong>c - a - e - d - b</strong>.
+                        </p>
+                    `
+                }
+            ]
+        };
+
+        const shuffledOptionsCache = {};
+        const userAnswers = {}; // { questionId: { val: "abc", isCorrect: true/false } }
+        let activeTabId = "ex11";
+
+        // Pre-shuffle answers once to avoid jarring shuffles on re-render
+        const initShuffleCache = () => {
+            Object.keys(database).forEach(exId => {
+                database[exId].forEach(q => {
+                    if (q.options) {
+                        shuffledOptionsCache[q.id] = [...q.options].sort(() => Math.random() - 0.5);
+                    }
+                });
+            });
+        };
+
+        const updateFooterScore = () => {
+            let correctCount = 0;
+            Object.keys(userAnswers).forEach(key => {
+                if (userAnswers[key] && userAnswers[key].isCorrect) {
+                    correctCount++;
+                }
+            });
+            const currentScore = correctCount * 10;
+            document.getElementById("footer-score-display").innerHTML = `⭐ Điểm của con: ${currentScore}`;
+        };
+
+        const renderTabs = () => {
+            const container = document.getElementById("tabs-container");
+            let html = "";
+            exercisesMeta.forEach(meta => {
+                const activeClass = meta.id === activeTabId ? "active" : "";
+                html += `
+                    <button class="tab-btn bg-white/95 border-2 border-[#E4F1FE] border-b-4 border-slate-300 py-2 px-1 rounded-xl font-black text-[#4A5568] transition-all hover:scale-[1.03] active:scale-[0.98] active:border-b-2 text-[11px] sm:text-xs flex items-center justify-center text-center gap-1 ${activeClass}" onclick="switchTab('${meta.id}')">
+                        <i class="fa-solid fa-star text-amber-400 text-[10px]"></i> ${meta.label}
+                    </button>
+                `;
+            });
+            container.innerHTML = html;
+        };
+
+        const switchTab = (tabId) => {
+            activeTabId = tabId;
+            renderTabs();
+            renderActiveQuiz();
+        };
+
+        const renderActiveQuiz = () => {
+            const container = document.getElementById("active-quiz-container");
+            const activeMeta = exercisesMeta.find(m => m.id === activeTabId);
+            const questions = database[activeTabId];
+            
+            let html = `
+                <div class="bg-white rounded-[24px] p-4 sm:p-5 mb-6 shadow-xl border-4 border-[#E4F1FE]">
+                    <div class="text-sm sm:text-base font-black text-[#8854C0] mb-4 pb-2.5 border-b-4 border-dashed border-[#E4F1FE] flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles animate-pulse"></i>
+                        <span>${activeMeta.title}</span>
+                    </div>
+            `;
+
+            questions.forEach((item, index) => {
+                const state = userAnswers[item.id];
+                const isAnswered = !!state;
+
+                html += `
+                    <div class="bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 sm:p-4 mb-4 last:mb-0 transition-all" id="box_${item.id}">
+                        <div class="text-xs sm:text-sm font-black text-slate-800 mb-3 flex items-start gap-2 leading-relaxed">
+                            <span class="bg-[#8854C0] text-white px-2 py-0.5 rounded-lg text-[10px] font-black shadow-md whitespace-nowrap">Câu ${index + 1}</span>
+                            <div class="w-full text-slate-700">${item.q}</div>
+                        </div>
+                `;
+
+                html += `<div class="grid grid-cols-1 gap-2 ${isAnswered ? 'answered pointer-events-none' : ''}">`;
+                const options = shuffledOptionsCache[item.id] || item.options;
+                options.forEach(opt => {
+                    let btnClass = "bg-white border-2 border-slate-200 border-b-4 border-slate-300 text-slate-700";
+                    let iconClass = "fa-regular fa-circle text-slate-300";
+
+                    if (isAnswered) {
+                        if (opt === state.val) {
+                            if (state.isCorrect) {
+                                btnClass = "correct text-emerald-800";
+                                iconClass = "fa-solid fa-circle-check text-emerald-600";
+                            } else {
+                                btnClass = "wrong text-rose-800";
+                                iconClass = "fa-solid fa-circle-xmark text-rose-600";
+                            }
+                        } else if (opt === item.ans) {
+                            btnClass = "correct text-emerald-800";
+                            iconClass = "fa-solid fa-circle-check text-emerald-600";
+                        }
+                        btnClass += " disabled";
+                    }
+
+                    html += `
+                        <button class="gamified-btn option-btn rounded-xl py-2.5 px-3.5 font-black text-xs text-left flex justify-between items-center gap-2.5 transition-all ${btnClass}" onclick="checkMcq(this, '${opt.replace(/'/g, "\\'")}', '${item.ans.replace(/'/g, "\\'")}', '${item.id}')">
+                            <span>${opt}</span>
+                            <i class="${iconClass} text-xs sm:text-sm shrink-0"></i>
+                        </button>
+                    `;
+                });
+                html += `</div>`;
+
+                // Detailed explanation box (displayed instantly after answering)
+                html += `
+                        <div class="mt-3 bg-[#F0F7FF] border-l-4 border-sky-600 rounded-lg p-3.5 hidden transition-all duration-300 animate-fadeIn" id="exp_${item.id}">
+                            <div class="font-black text-sky-800 mb-1.5 text-xs flex items-center gap-1.5">
+                                <i class="fa-solid fa-graduation-cap text-[#8854C0]"></i> Giải thích chi tiết từ Cô Lê Hằng:
+                            </div>
+                            <div class="text-[11px] sm:text-xs text-slate-700 font-bold leading-relaxed">${item.exp}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+
+            // Immediately show explanations for already answered questions
+            questions.forEach(item => {
+                if (userAnswers[item.id]) {
+                    const expBox = document.getElementById(`exp_${item.id}`);
+                    if (expBox) expBox.classList.remove("hidden");
+                }
+            });
+        };
+
+        const checkMcq = (element, selection, correctAnswer, id) => {
+            const parent = element.closest(".grid");
+            if (parent.classList.contains("answered")) return;
+
+            const isCorrect = selection === correctAnswer;
+            userAnswers[id] = { val: selection, isCorrect: isCorrect };
+
+            if (isCorrect) {
+                playSfx('correct');
+                createConfettiExplosion();
+            } else {
+                playSfx('wrong');
+                const qBox = element.closest("[id^='box_']");
+                qBox.classList.add("shake");
+                setTimeout(() => qBox.classList.remove("shake"), 500);
+            }
+
+            updateFooterScore();
+            renderActiveQuiz();
+        };
+
+        const gradeExam = () => {
+            let correctCount = 0;
+            let totalQuestions = 0;
+
+            const exercisesKeys = exercisesMeta.map(m => m.id);
+            exercisesKeys.forEach(key => {
+                database[key].forEach(q => {
+                    totalQuestions++;
+                    if (userAnswers[q.id] && userAnswers[q.id].isCorrect) {
+                        correctCount++;
+                    }
+                });
+            });
+
+            const scorePercent = (correctCount / totalQuestions) * 100;
+            const display = document.getElementById("scoreDisplay");
+            display.innerText = `${correctCount} / ${totalQuestions}`;
+
+            const feedback = document.getElementById("feedbackDisplay");
+            let message = "";
+
+            if (scorePercent < 50) {
+                message = "😢 <strong>Ms Lê Hằng nhắn nhủ:</strong><br>\"Điểm lần này chưa cao lắm, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!\"";
+            } else if (scorePercent >= 60 && scorePercent <= 80) {
+                message = "😉 <strong>Ms Lê Hằng nhắn nhủ:</strong><br>\"Con đã có tiến bộ khá ổn rồi, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!\"";
+            } else {
+                message = "🌟 <strong>Ms Lê Hằng nhắn nhủ:</strong><br>\"Làm tốt lắm, con cố gắng rinh điểm 10 tuyệt đối ở lần sau nha!\"";
+            }
+
+            feedback.innerHTML = message;
+            
+            const modal = document.getElementById("gradeModal");
+            const card = document.getElementById("modal-card");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+            setTimeout(() => {
+                card.classList.remove("scale-90");
+                card.classList.add("scale-100");
+            }, 50);
+
+            if (scorePercent >= 80) {
+                createConfettiExplosion();
+                setTimeout(createConfettiExplosion, 350);
+            }
+        };
+
+        const closeGradeModal = () => {
+            const modal = document.getElementById("gradeModal");
+            const card = document.getElementById("modal-card");
+            card.classList.remove("scale-100");
+            card.classList.add("scale-90");
+            
+            setTimeout(() => {
+                modal.classList.remove("flex");
+                modal.classList.add("hidden");
+                // Clear answers to let them try again
+                Object.keys(userAnswers).forEach(k => delete userAnswers[k]);
+                updateFooterScore();
+                switchTab("ex11");
+            }, 150);
+        };
+
+        window.onload = () => {
+            initShuffleCache();
+            renderTabs();
+            renderActiveQuiz();
+            updateFooterScore();
+        };
+    </script>
+</body>
+</html>
